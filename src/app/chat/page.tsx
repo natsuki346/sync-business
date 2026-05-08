@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { groupChats, directChats, people, allTags } from '@/data/mock'
+import { groupChats, directChats, people } from '@/data/mock'
 
 type Tab = 'group' | 'direct'
 

@@ -1,6 +1,5 @@
 import { people } from '@/data/mock'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 
 const tagConfig = {
   hobby:    { label: '🎵 趣味・好きなこと', bg: '#EAF3DE', color: '#3B6D11' },
