@@ -21,15 +21,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className={notoSansJP.className}>
-        <div className="min-h-screen bg-gray-50 flex justify-center">
-          <div className="w-full max-w-[390px] mx-auto relative">
+      <body className={`${notoSansJP.className} bg-gray-200 min-h-screen flex items-center justify-center`}>
+        <div
+          style={{
+            width: 390,
+            height: 844,
+            borderRadius: 40,
+            boxShadow: '0 0 0 8px #1a1a1a, 0 20px 60px rgba(0,0,0,0.4)',
+            overflow: 'hidden',
+            position: 'relative',
+            background: 'white',
+            transform: 'translateZ(0)',
+          }}
+        >
+          <div className="h-full overflow-y-auto">
             <Header />
             <main className="pb-28">
               {children}
             </main>
-            <BottomNav />
           </div>
+          <BottomNav />
         </div>
       </body>
     </html>

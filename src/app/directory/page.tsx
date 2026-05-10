@@ -53,6 +53,11 @@ const kanaRows = [
   { label: 'わ', chars: 'わをん' },
 ]
 
+function getMatchedTags(person: Person, query: string): string[] {
+  if (!query) return []
+  return Object.values(person.tags).flat().filter(t => t.includes(query))
+}
+
 function getKanaRow(name: string): string {
   const firstChar = name.replace(/\s/g, '')[0]
   const kana = kanjiToKana[firstChar] ?? firstChar
@@ -77,7 +82,10 @@ export default function DirectoryPage() {
 
   let filtered: Person[]
   if (searchQuery) {
-    filtered = allPeople.filter(p => p.name.includes(searchQuery))
+    filtered = allPeople.filter(p =>
+      p.name.includes(searchQuery) ||
+      Object.values(p.tags).flat().some(t => t.includes(searchQuery))
+    )
   } else if (selectedTag) {
     filtered = allPeople.filter(p => p.followingTags.includes(selectedTag))
   } else {
@@ -101,13 +109,13 @@ export default function DirectoryPage() {
         <div className="px-4 pt-3 pb-2">
           <input
             type="text"
-            placeholder="名前で検索..."
+            placeholder="名前・タグで検索..."
             value={searchQuery}
             onChange={e => {
               setSearchQuery(e.target.value)
               if (e.target.value) setSelectedTag(null)
             }}
-            className="w-full bg-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none"
+            className="w-full bg-gray-100 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-none">
@@ -156,26 +164,41 @@ export default function DirectoryPage() {
                 >
                   {label}行
                 </div>
-                {members.map((person, i) => (
-                  <Link key={person.id} href={`/profile/${person.id}`}>
-                    <div
-                      className={`flex items-center gap-3 px-4 py-3 active:bg-gray-50 transition-colors ${
-                        i < members.length - 1 ? 'border-b border-gray-100' : ''
-                      }`}
-                    >
+                {members.map((person, i) => {
+                  const matchedTags = getMatchedTags(person, searchQuery)
+                  return (
+                    <Link key={person.id} href={`/profile/${person.id}`}>
                       <div
-                        className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-xs flex-shrink-0"
-                        style={{ backgroundColor: person.avatarColor }}
+                        className={`flex items-center gap-3 px-4 py-3 active:bg-gray-50 transition-colors ${
+                          i < members.length - 1 ? 'border-b border-gray-100' : ''
+                        }`}
                       >
-                        {person.name.replace(/\s/g, '').slice(0, 2)}
+                        <div
+                          className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-xs flex-shrink-0"
+                          style={{ backgroundColor: person.avatarColor }}
+                        >
+                          {person.name.replace(/\s/g, '').slice(0, 2)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-gray-900">{person.name}</div>
+                          <div className="text-xs text-gray-400">{person.department}・{person.year}</div>
+                          {matchedTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                              {matchedTags.map(tag => (
+                                <span
+                                  key={tag}
+                                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#1D9E75] text-white"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-sm font-bold text-gray-900">{person.name}</div>
-                        <div className="text-xs text-gray-400">{person.department}・{person.year}</div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  )
+                })}
               </div>
             ))
           )}
